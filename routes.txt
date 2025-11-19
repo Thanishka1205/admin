@@ -1,0 +1,81 @@
+@app.route('/scores_by_set/<int:set_number>')
+def scores_by_set(set_number):
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed", "danger")
+        return redirect(url_for('dashboard'))
+    
+    try:
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get all scores for the specified set
+        query = """
+            SELECT 
+                c.id as candidate_id,
+                c.full_name,
+                c.email,
+                s.attempt_number,
+                s.total_questions,
+                s.correct_answers,
+                s.score_percent,
+                s.submitted_at
+            FROM candidates c
+            JOIN scores s ON c.id = s.candidate_id
+            JOIN answers a ON c.id = a.candidate_id
+            JOIN questions q ON a.question_id = q.question_id
+            WHERE q.set_number = %s
+            GROUP BY c.id, s.attempt_number
+            ORDER BY s.score_percent DESC, s.submitted_at ASC
+        """
+        cursor.execute(query, (set_number,))
+        scores = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('scores_by_set.html', 
+                             scores=scores, 
+                             selected_set=set_number)
+                             
+    except Exception as e:
+        print(f"Error fetching scores by set: {e}")
+        flash("Error retrieving scores", "danger")
+        return redirect(url_for('dashboard'))
+
+@app.route('/scores')
+def scores():
+    conn = get_db_connection()
+    if not conn:
+        flash("Database connection failed", "danger")
+        return redirect(url_for('dashboard'))
+    
+    try:
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get all candidate scores
+        query = """
+            SELECT 
+                c.id as candidate_id,
+                c.full_name,
+                c.email,
+                s.attempt_number,
+                s.total_questions,
+                s.correct_answers,
+                s.score_percent,
+                s.submitted_at
+            FROM candidates c
+            JOIN scores s ON c.id = s.candidate_id
+            ORDER BY s.score_percent DESC, s.submitted_at ASC
+        """
+        cursor.execute(query)
+        scores = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('scores.html', scores=scores)
+                             
+    except Exception as e:
+        print(f"Error fetching scores: {e}")
+        flash("Error retrieving scores", "danger")
+        return redirect(url_for('dashboard'))

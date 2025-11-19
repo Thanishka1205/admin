@@ -1,0 +1,8 @@
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+mysql-connector-python==9.1.0
+boto3==1.38.40
+bcrypt==4.3.0
+python-socketio==5.8.0
+Werkzeug==2.3.7
+python-dotenv==1.0.0

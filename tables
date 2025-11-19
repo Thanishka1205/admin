@@ -1,0 +1,89 @@
+mysql> describe answers;
++-----------------+------------+------+-----+-------------------+-------------------+
+| Field           | Type       | Null | Key | Default           | Extra             |
++-----------------+------------+------+-----+-------------------+-------------------+
+| answer_id       | int        | NO   | PRI | NULL              | auto_increment    |
+| candidate_id    | int        | YES  | MUL | NULL              |                   |
+| question_id     | int        | YES  | MUL | NULL              |                   |
+| selected_option | varchar(1) | YES  |     | NULL              |                   |
+| is_correct      | tinyint(1) | YES  |     | NULL              |                   |
+| answered_at     | datetime   | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| score_id        | int        | YES  |     | NULL              |                   |
++-----------------+------------+------+-----+-------------------+-------------------+
+7 rows in set (0.42 sec)
+
+mysql> describe candidates;
++------------------+--------------+------+-----+-------------------+-------------------+
+| Field            | Type         | Null | Key | Default           | Extra             |
++------------------+--------------+------+-----+-------------------+-------------------+
+| id               | int          | NO   | PRI | NULL              | auto_increment    |
+| full_name        | varchar(100) | NO   |     | NULL              |                   |
+| email            | varchar(100) | NO   |     | NULL              |                   |
+| phone            | varchar(15)  | NO   |     | NULL              |                   |
+| area             | varchar(100) | YES  |     | NULL              |                   |
+| city             | varchar(100) | YES  |     | NULL              |                   |
+| pincode          | varchar(10)  | YES  |     | NULL              |                   |
+| position         | varchar(100) | NO   |     | NULL              |                   |
+| has_experience   | tinyint(1)   | YES  |     | 0                 |                   |
+| previous_company | varchar(100) | YES  |     | NULL              |                   |
+| role             | varchar(100) | YES  |     | NULL              |                   |
+| domain           | varchar(100) | YES  |     | NULL              |                   |
+| years_experience | float        | YES  |     | NULL              |                   |
+| tech_stack       | text         | YES  |     | NULL              |                   |
+| submitted_at     | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++------------------+--------------+------+-----+-------------------+-------------------+
+15 rows in set (0.13 sec)
+
+mysql> describe questions;
++----------------+-----------------------------------------------------------------------+------+-----+---------+----------------+
+| Field          | Type                                                                  | Null | Key | Default | Extra          |
++----------------+-----------------------------------------------------------------------+------+-----+---------+----------------+
+| question_id    | int                                                                   | NO   | PRI | NULL    | auto_increment |
+| set_number     | int                                                                   | NO   |     | NULL    |                |
+| category       | enum('English Proficiency','Logical Reasoning','Analytical Thinking') | NO   |     | NULL    |                |
+| question_text  | text                                                                  | NO   |     | NULL    |                |
+| option_a       | text                                                                  | NO   |     | NULL    |                |
+| option_b       | text                                                                  | NO   |     | NULL    |                |
+| option_c       | text                                                                  | NO   |     | NULL    |                |
+| option_d       | text                                                                  | NO   |     | NULL    |                |
+| correct_option | enum('A','B','C','D')                                                 | NO   |     | NULL    |                |
++----------------+-----------------------------------------------------------------------+------+-----+---------+----------------+
+9 rows in set (0.14 sec)
+
+mysql> describe scores;
++-----------------+--------------+------+-----+-------------------+-------------------+
+| Field           | Type         | Null | Key | Default           | Extra             |
++-----------------+--------------+------+-----+-------------------+-------------------+
+| score_id        | int          | NO   | PRI | NULL              | auto_increment    |
+| candidate_id    | int          | YES  | MUL | NULL              |                   |
+| attempt_number  | int          | YES  |     | NULL              |                   |
+| total_questions | int          | YES  |     | NULL              |                   |
+| correct_answers | int          | YES  |     | NULL              |                   |
+| score_percent   | decimal(5,2) | YES  |     | NULL              |                   |
+| submitted_at    | datetime     | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++-----------------+--------------+------+-----+-------------------+-------------------+
+7 rows in set (0.46 sec)
+
+mysql> describe test_history;
++----------------+----------+------+-----+-------------------+-------------------+
+| Field          | Type     | Null | Key | Default           | Extra             |
++----------------+----------+------+-----+-------------------+-------------------+
+| history_id     | int      | NO   | PRI | NULL              | auto_increment    |
+| candidate_id   | int      | YES  | MUL | NULL              |                   |
+| question_id    | int      | YES  | MUL | NULL              |                   |
+| attempt_number | int      | YES  |     | NULL              |                   |
+| assigned_at    | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++----------------+----------+------+-----+-------------------+-------------------+
+5 rows in set (0.21 sec)
+
+mysql> describe admin_users;
+
++---------------+--------------+------+-----+---------+----------------+
+| Field         | Type         | Null | Key | Default | Extra          |
++---------------+--------------+------+-----+---------+----------------+
+| id            | int          | NO   | PRI | NULL    | auto_increment |
+| username      | varchar(50)  | YES  | UNI | NULL    |                |
+| password_hash | varchar(255) | YES  |     | NULL    |                |
++---------------+--------------+------+-----+---------+----------------+
+
+3 rows in set (0.02 sec)

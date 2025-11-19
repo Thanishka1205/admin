@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Answers - Candidate {{ score.full_name }} (Set {{ score.set_number }})</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #5674ab, #e0e9fa);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .answers-box {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .navigation {
+            margin-bottom: 30px;
+        }
+
+        .summary-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .category-summary {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .category-item {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .category-item h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .category-item p {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .category-item .no-questions {
+            color: #888;
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .bg-success { background-color: #28a745; }
+        .bg-danger { background-color: #dc3545; }
+
+        .btn {
+            background-color: #3498db;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .alert {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .candidate-info {
+            margin-bottom: 20px;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .candidate-info p {
+            margin: 5px 0;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 600px) {
+            .answers-box {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .category-item {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="answers-box">
+        <h1>View Answers - {{ score.full_name }}</h1>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <a href="{{ url_for('view_scores', set_number=score.set_number) }}" class="btn">Back to Scores </a>
+        </div>
+
+        <!-- Candidate and Score Information -->
+        <div class="candidate-info">
+            <h2>Candidate Details</h2>
+            <p><strong>Name:</strong> {{ score.full_name }}</p>
+            <p><strong>Email:</strong> {{ score.email }}</p>
+            <p><strong>Test Attempt:</strong> Set {{ score.set_number }} (Attempt #{{ score.attempt_number }})</p>
+            <p><strong>Total Score:</strong> {{ "%.1f"|format(score.score_percent) }}% ({{ score.correct_answers }}/{{ score.total_questions }} correct)</p>
+            <p><strong>Submitted At:</strong> {{ score.submitted_at.strftime('%Y-%m-%d %I:%M:%S %p IST') }}</p>
+        </div>
+
+        <!-- Summary of Correct Answers by Category -->
+        <div class="summary-box">
+            <h3>Category-wise Performance</h3>
+            <div class="category-summary">
+                {% set categories = ['English Proficiency', 'Logical Reasoning', 'Analytical Thinking'] %}
+                {% for category in categories %}
+                    {% set category_answers = answers | selectattr('category', 'equalto', category) | list %}
+                    {% set correct_count = category_answers | selectattr('is_correct', 'equalto', 1) | list | length %}
+                    {% set total_count = category_answers | length %}
+                    <div class="category-item">
+                        <h4>{{ category }}</h4>
+                        {% if total_count > 0 %}
+                            <p>{{ correct_count }}/{{ total_count }} correct</p>
+                        {% else %}
+                            <p class="no-questions">No questions in this category</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Answers Table -->
+        {% if answers %}
+            <h2>Answer Details</h2>
+            <table role="grid">
+                <thead>
+                    <tr>
+                        <th scope="col">Category</th>
+                        <th scope="col">Question</th>
+                        <th scope="col">Selected Option</th>
+                        <th scope="col">Correct Option</th>
+                        <th scope="col">Result</th>
+                        <th scope="col">Answered At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for answer in answers %}
+                        <tr>
+                            <td>{{ answer.category }}</td>
+                            <td>{{ answer.question_text }}</td>
+                            <td>
+                                {% if answer.selected_option %}
+                                    {{ answer.selected_option }}: {{ answer['option_' + answer.selected_option.lower()] }}
+                                {% else %}
+                                    Not Answered
+                                {% endif %}
+                            </td>
+                            <td>{{ answer.correct_option }}: {{ answer['option_' + answer.correct_option.lower()] }}</td>
+                            <td>
+                                {% if answer.is_correct %}
+                                    <span class="badge bg-success" aria-label="Correct">Correct</span>
+                                {% else %}
+                                    <span class="badge bg-danger" aria-label="Incorrect">Incorrect</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ answer.answered_at.strftime('%Y-%m-%d %I:%M:%S %p IST') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert" role="alert">
+                No answers found for this test attempt.
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

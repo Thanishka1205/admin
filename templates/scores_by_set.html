@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scores by Set {% if selected_set %} - Set {{ selected_set }}{% endif %}</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #5674ab, #e0e9fa);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .scores-box {
+            background-color: #ffffff;
+            padding: 40px; /* Aligned with view_answers_by_set.html */
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 1100px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px; /* Aligned with view_answers_by_set.html */
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .navigation {
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .score-cell {
+            font-weight: bold;
+        }
+        
+        .high-score {
+            color: #28a745;
+        }
+        
+        .low-score {
+            color: #dc3545;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            margin: 0 auto 20px;
+            text-align: left;
+        }
+
+        label {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        select {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #fff;
+        }
+
+        .form-text {
+            text-align: center;
+            display: block;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 100%;
+            border-collapse: collapse;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            overflow: hidden;
+            table-layout: auto;
+        }
+
+        th,
+        td {
+            padding: 12px 15px; /* Aligned with view_answers_by_set.html */
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            width: auto;
+        }
+
+        th.sortable:hover {
+            background-color: #2980b9;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f6fa;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1; /* Aligned with view_answers_by_set.html */
+        }
+
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 8%;
+            text-align: center;
+        }
+
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 14%;
+            text-align: left;
+        }
+
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 20%;
+            text-align: left;
+        }
+
+        th:nth-child(4),
+        td:nth-child(4) {
+            width: 8%;
+            text-align: center;
+        }
+
+        th:nth-child(5),
+        td:nth-child(5) {
+            width: 10%;
+            text-align: center;
+        }
+
+        th:nth-child(6),
+        td:nth-child(6) {
+            width: 10%;
+            text-align: center;
+        }
+
+        th:nth-child(7),
+        td:nth-child(7) {
+            width: 15%;
+            text-align: center;
+        }
+
+        th:nth-child(8),
+        td:nth-child(8) {
+            width: 15%;
+            text-align: center;
+        }
+
+        .badge {
+            padding: 5px 10px; /* Aligned with view_answers_by_set.html */
+            border-radius: 12px;
+            font-size: 14px; /* Aligned with view_answers_by_set.html */
+            color: white;
+            display: inline-block;
+            min-width: 50px;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+        }
+
+        .btn {
+            background-color: #3498db;
+            border: none;
+            color: white;
+            padding: 10px 20px; /* Aligned with view_answers_by_set.html */
+            border-radius: 10px;
+            font-size: 16px; /* Aligned with view_answers_by_set.html */
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-submit {
+            padding: 10px 20px;
+            font-size: 16px;
+            width: auto;
+        }
+
+        .alert {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .scores-box {
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            th,
+            td {
+                padding: 8px 10px; /* Aligned with view_answers_by_set.html */
+                font-size: 14px; /* Aligned with view_answers_by_set.html */
+            }
+
+            .badge {
+                padding: 4px 8px;
+                font-size: 12px; /* Adjusted for better mobile fit */
+                min-width: 40px;
+            }
+
+            .btn {
+                padding: 8px 16px; /* Aligned with view_answers_by_set.html */
+                font-size: 14px; /* Aligned with view_answers_by_set.html */
+            }
+
+            .form-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+            }
+
+            select {
+                width: 100%;
+            }
+
+            .btn-submit {
+                width: 100%;
+            }
+
+            th:nth-child(3),
+            td:nth-child(3),
+            th:nth-child(7),
+            td:nth-child(7) {
+                display: none;
+            }
+
+            th:nth-child(8),
+            td:nth-child(8) {
+                width: 20%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scores-box">
+        <h1>Scores by Set{% if selected_set %} - Set {{ selected_set }}{% endif %}</h1>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+        </div>
+
+        <!-- Set Selection Form -->
+        <form method="POST" class="form-group">
+            <label for="set_number">Select Set:</label>
+            <select name="set_number" id="set_number" aria-describedby="set-selection-help">
+                {% for set_number in sets %}
+                    <option value="{{ set_number }}" {% if set_number == selected_set %}selected{% endif %}>
+                        Set {{ set_number }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-submit">View Scores</button>
+        </form>
+        <small id="set-selection-help" class="form-text">
+            Select a set to view candidate scores.
+        </small>
+
+        <!-- Scores Table -->
+        {% if selected_set %}
+            <h2>Scores for Set {{ selected_set }}</h2>
+            {% if scores %}
+                <div class="table-wrapper">
+                    <table role="grid">
+                        <thead>
+                            <tr>
+                                <th class="sortable" scope="col">Candidate ID</th>
+                                <th class="sortable" scope="col">Full Name</th>
+                                <th class="sortable" scope="col">Email</th>
+                                <th class="sortable" scope="col">Attempt #</th>
+                                <th class="sortable" scope="col">Score (%)</th>
+                                <th scope="col">Correct Answers</th>
+                                <th class="sortable" scope="col">Submitted At</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for score in scores %}
+                                <tr>
+                                    <td>{{ score.candidate_id }}</td>
+                                    <td>{{ score.full_name }}</td>
+                                    <td>{{ score.email }}</td>
+                                    <td>{{ score.attempt_number }}</td>
+                                    <td>
+                                        {% set score_class = 'bg-success' if score.score_percent >= 70 else ('bg-warning' if score.score_percent >= 50 else 'bg-danger') %}
+                                        <span class="badge {{ score_class }}" aria-label="Score: {{ '%.1f'|format(score.score_percent) }} percent">
+                                            {{ "%.1f"|format(score.score_percent) }}%
+                                        </span>
+                                    </td>
+                                    <td>{{ score.correct_answers }}/{{ score.total_questions }}</td>
+                                    <td>
+                                        {% if score.submitted_at %}
+                                            {{ score.submitted_at.strftime('%Y-%m-%d %I:%M:%S %p IST') }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_answers_by_set', score_id=score.score_id) }}"
+                                           class="btn"
+                                           aria-label="View answers for candidate {{ score.full_name }}">
+                                            View Answers
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert" role="alert">
+                    No scores found for Set {{ selected_set }}.
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert" role="alert">
+                No sets available.
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Basic sorting functionality for table headers
+        document.querySelectorAll('th.sortable').forEach(header => {
+            header.addEventListener('click', () => {
+                const table = header.closest('table');
+                const index = Array.from(header.parentElement.children).indexOf(header);
+                const isAscending = header.classList.toggle('asc');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.rows);
+
+                rows.sort((a, b) => {
+                    const aValue = a.cells[index].textContent.trim();
+                    const bValue = b.cells[index].textContent.trim();
+
+                    // Handle numeric columns (Candidate ID, Attempt #, Score)
+                    if (index === 0 || index === 3 || index === 4) {
+                        const aNum = parseFloat(aValue.replace('%', ''));
+                        const bNum = parseFloat(bValue.replace('%', ''));
+                        return isAscending ? aNum - bNum : bNum - aNum;
+                    }
+
+                    // Handle date column (Submitted At)
+                    if (index === 6) {
+                        const aDate = aValue === 'N/A' ? 0 : new Date(aValue);
+                        const bDate = bValue === 'N/A' ? 0 : new Date(bValue);
+                        return isAscending ? aDate - bDate : bDate - aDate;
+                    }
+
+                    // Handle text columns (Full Name, Email)
+                    return isAscending
+                        ? aValue.localeCompare(bValue)
+                        : bValue.localeCompare(aValue);
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        });
+    </script>
+</body>
+</html>

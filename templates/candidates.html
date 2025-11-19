@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Information</title>
+    <style>
+        body {
+            background-color: #f4f7fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .navigation {
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: #3498db;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .table-container {
+            max-width: 95%;
+            margin: 0 auto;
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1000px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #eaf4ff;
+        }
+
+        @media screen and (max-width: 768px) {
+            h2 {
+                font-size: 20px;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .table-container {
+                padding: 10px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Candidate List</h2>
+    <div class="navigation">
+        <a href="{{ url_for('dashboard') }}" class="btn" aria-label="Back to Dashboard">Back to Dashboard</a>
+        <a href="{{ url_for('download_candidates_csv') }}" class="btn" style="margin-left: 10px;" aria-label="Download Candidates CSV">Download CSV</a>
+    </div>
+    <div class="table-container">
+        <table>
+            <tr>
+                {% for col in candidates[0].keys() %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for candidate in candidates %}
+            <tr>
+                {% for value in candidate.values() %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

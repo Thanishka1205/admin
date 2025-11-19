@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Test Videos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .video-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (max-width: 640px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">Test Videos from S3</h1>
+            <a href="{{ url_for('dashboard') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Back to Dashboard
+            </a>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="bg-{{ 'green' if category == 'success' else 'red' }}-100 border border-{{ 'green' if category == 'success' else 'red' }}-400 text-{{ 'green' if category == 'success' else 'red' }}-700 px-4 py-3 rounded mb-4" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% if videos %}
+            <div class="mb-4 text-gray-600">
+                <p>Total videos found: <strong>{{ videos|length }}</strong></p>
+            </div>
+            
+            <div class="video-grid">
+                {% for video in videos %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden video-card">
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2 truncate" title="{{ video.filename }}">
+                                {{ video.filename }}
+                            </h3>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                {% if video.candidate_id %}
+                                <p><span class="font-medium">Candidate ID:</span> {{ video.candidate_id }}</p>
+                                {% endif %}
+                                {% if video.attempt_number %}
+                                <p><span class="font-medium">Attempt:</span> {{ video.attempt_number }}</p>
+                                {% endif %}
+                                <p><span class="font-medium">Size:</span> 
+                                    {% if video.size < 1024 %}
+                                        {{ video.size }} B
+                                    {% elif video.size < 1048576 %}
+                                        {{ "%.2f"|format(video.size / 1024) }} KB
+                                    {% else %}
+                                        {{ "%.2f"|format(video.size / 1048576) }} MB
+                                    {% endif %}
+                                </p>
+                                <p><span class="font-medium">Uploaded:</span> 
+                                    {{ video.last_modified.strftime('%Y-%m-%d %H:%M:%S') if video.last_modified else 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('view_video', s3_key=video.key) }}" 
+                           class="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center font-medium py-2 px-4 rounded transition">
+                            View Video
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                <p class="text-gray-600 text-lg">No videos found in the S3 bucket.</p>
+                <p class="text-gray-500 text-sm mt-2">Videos will appear here once candidates upload their test recordings.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

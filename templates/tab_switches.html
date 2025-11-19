@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Switch Monitoring</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #5674ab, #e0e9fa);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .btn {
+            background-color: #3498db;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .stats-section, .detailed-section {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #eaf4ff;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .badge-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .switch-out {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .switch-back {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .summary-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Tab Switch Monitoring</h1>
+            <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="background-color: {{ 'green' if category == 'success' else 'red' }}-100; border: 1px solid {{ 'green' if category == 'success' else 'red' }}-400; color: {{ 'green' if category == 'success' else 'red' }}-700; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Summary Section -->
+        <div class="stats-section">
+            <h2>Summary by Candidate</h2>
+            
+            {% if candidate_stats %}
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h3>Total Candidates</h3>
+                        <p class="value">{{ candidate_stats|length }}</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Total Switch Events</h3>
+                        <p class="value">{{ candidate_stats|sum(attribute='total_switches') }}</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Highest Switcher</h3>
+                        <p class="value">{{ candidate_stats[0].total_switches if candidate_stats else 0 }}</p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Candidate ID</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Attempts</th>
+                                <th>Switch Outs</th>
+                                <th>Switch Backs</th>
+                                <th>Total Switches</th>
+                                <th>Last Switch Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in candidate_stats %}
+                            <tr>
+                                <td>{{ stat.candidate_id }}</td>
+                                <td>{{ stat.full_name }}</td>
+                                <td>{{ stat.email }}</td>
+                                <td>{{ stat.total_attempts }}</td>
+                                <td>
+                                    <span class="badge badge-danger">{{ stat.total_switch_outs }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-success">{{ stat.total_switch_backs }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'badge-warning' if stat.total_switches > 10 else 'badge-info' }}">
+                                        {{ stat.total_switches }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if stat.last_switch_time %}
+                                        {{ stat.last_switch_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>No tab switch data available yet.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Detailed Log Section -->
+        <div class="detailed-section">
+            <h2>Detailed Switch Log</h2>
+            
+            {% if switches %}
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Switch ID</th>
+                                <th>Candidate ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Attempt #</th>
+                                <th>Switch Type</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for switch in switches %}
+                            <tr>
+                                <td>{{ switch.switch_id }}</td>
+                                <td>{{ switch.candidate_id }}</td>
+                                <td>{{ switch.full_name }}</td>
+                                <td>{{ switch.email }}</td>
+                                <td>{{ switch.attempt_number }}</td>
+                                <td>
+                                    <span class="{{ 'switch-out' if switch.switch_type == 'switch_out' else 'switch-back' }}">
+                                        {{ 'Switched Out' if switch.switch_type == 'switch_out' else 'Switched Back' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if switch.switched_at %}
+                                        {{ switch.switched_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>No detailed switch logs available yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
