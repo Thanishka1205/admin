@@ -205,13 +205,7 @@
 
         th:nth-child(7),
         td:nth-child(7) {
-            width: 15%;
-            text-align: center;
-        }
-
-        th:nth-child(8),
-        td:nth-child(8) {
-            width: 15%;
+            width: 20%;
             text-align: center;
         }
 
@@ -321,11 +315,6 @@
             td:nth-child(7) {
                 display: none;
             }
-
-            th:nth-child(8),
-            td:nth-child(8) {
-                width: 20%;
-            }
         }
     </style>
 </head>
@@ -369,7 +358,6 @@
                                 <th class="sortable" scope="col">Score (%)</th>
                                 <th scope="col">Correct Answers</th>
                                 <th class="sortable" scope="col">Submitted At</th>
-                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -392,13 +380,6 @@
                                         {% else %}
                                             N/A
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{{ url_for('view_answers_by_set', score_id=score.score_id) }}"
-                                           class="btn"
-                                           aria-label="View answers for candidate {{ score.full_name }}">
-                                            View Answers
-                                        </a>
                                     </td>
                                 </tr>
                             {% endfor %}

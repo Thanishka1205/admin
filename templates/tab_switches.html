@@ -220,11 +220,11 @@
                     </div>
                     <div class="summary-card">
                         <h3>Total Switch Events</h3>
-                        <p class="value">{{ candidate_stats|sum(attribute='total_switches') }}</p>
+                        <p class="value">{{ candidate_stats|sum(attribute='total_switch_outs') }}</p>
                     </div>
                     <div class="summary-card">
                         <h3>Highest Switcher</h3>
-                        <p class="value">{{ candidate_stats[0].total_switches if candidate_stats else 0 }}</p>
+                        <p class="value">{{ candidate_stats[0].total_switch_outs if candidate_stats else 0 }}</p>
                     </div>
                 </div>
 
@@ -236,10 +236,9 @@
                                 <th>Full Name</th>
                                 <th>Email</th>
                                 <th>Attempts</th>
-                                <th>Switch Outs</th>
-                                <th>Switch Backs</th>
-                                <th>Total Switches</th>
-                                <th>Last Switch Time</th>
+                                <th>Total Switch Outs</th>
+                                <th>Total Records</th>
+                                <th>Last Updated</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -250,14 +249,11 @@
                                 <td>{{ stat.email }}</td>
                                 <td>{{ stat.total_attempts }}</td>
                                 <td>
-                                    <span class="badge badge-danger">{{ stat.total_switch_outs }}</span>
+                                    <span class="badge badge-danger">{{ stat.total_switch_outs or 0 }}</span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-success">{{ stat.total_switch_backs }}</span>
-                                </td>
-                                <td>
-                                    <span class="badge {{ 'badge-warning' if stat.total_switches > 10 else 'badge-info' }}">
-                                        {{ stat.total_switches }}
+                                    <span class="badge badge-info">
+                                        {{ stat.total_records }}
                                     </span>
                                 </td>
                                 <td>
@@ -288,31 +284,31 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Switch ID</th>
+                                <th>ID</th>
                                 <th>Candidate ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Attempt #</th>
-                                <th>Switch Type</th>
-                                <th>Timestamp</th>
+                                <th>Switch Out Count</th>
+                                <th>Last Updated</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for switch in switches %}
                             <tr>
-                                <td>{{ switch.switch_id }}</td>
+                                <td>{{ switch.id }}</td>
                                 <td>{{ switch.candidate_id }}</td>
                                 <td>{{ switch.full_name }}</td>
                                 <td>{{ switch.email }}</td>
                                 <td>{{ switch.attempt_number }}</td>
                                 <td>
-                                    <span class="{{ 'switch-out' if switch.switch_type == 'switch_out' else 'switch-back' }}">
-                                        {{ 'Switched Out' if switch.switch_type == 'switch_out' else 'Switched Back' }}
+                                    <span class="switch-out">
+                                        {{ switch.switch_out_count or 0 }}
                                     </span>
                                 </td>
                                 <td>
-                                    {% if switch.switched_at %}
-                                        {{ switch.switched_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    {% if switch.updated_at %}
+                                        {{ switch.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}
                                     {% else %}
                                         N/A
                                     {% endif %}

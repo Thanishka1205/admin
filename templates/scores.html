@@ -6,8 +6,6 @@
     <title>Candidate Assessment Scores</title>
     <!-- Bootstrap CSS for styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Optional custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .alert { margin-bottom: 20px; }
         .table-responsive { overflow-x: auto; }
@@ -79,7 +77,6 @@
                                             <th>Score</th>
                                             <th>Correct Answers</th>
                                             <th>Submitted At</th>
-                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -99,12 +96,6 @@
                                                     {% else %}
                                                         N/A
                                                     {% endif %}
-                                                </td>
-                                                <td>
-                                                    <a href="{{ url_for('view_answers', score_id=attempt.score_id) }}"
-                                                       class="btn btn-sm btn-outline-primary">
-                                                        View Answers
-                                                    </a>
                                                 </td>
                                             </tr>
                                         {% endfor %}
