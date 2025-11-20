@@ -106,6 +106,7 @@
         <a href="{{ url_for('download_candidates_csv') }}" class="btn" style="margin-left: 10px;" aria-label="Download Candidates CSV">Download CSV</a>
     </div>
     <div class="table-container">
+        {% if candidates %}
         <table>
             <tr>
                 {% for col in candidates[0].keys() %}
@@ -120,6 +121,9 @@
             </tr>
             {% endfor %}
         </table>
+        {% else %}
+        <p style="text-align: center; padding: 40px; color: #666;">No candidates found.</p>
+        {% endif %}
     </div>
 </body>
 </html>

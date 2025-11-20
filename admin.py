@@ -132,10 +132,11 @@ def dashboard():
 @login_required
 def view_candidates():
     conn = None
+    cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM candidates")
+        cursor.execute("SELECT * FROM candidates ORDER BY submitted_at DESC")
         candidates = cursor.fetchall()
         return render_template('candidates.html', candidates=candidates)
     except Exception as e:
@@ -144,6 +145,8 @@ def view_candidates():
         flash('Error loading candidates. Please try again later.', 'danger')
         return redirect(url_for('dashboard'))
     finally:
+        if cursor:
+            cursor.close()
         if conn and conn.is_connected():
             conn.close()
 
